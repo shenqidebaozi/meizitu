@@ -2,7 +2,7 @@
  * @Author: Baozi 
  * @Date: 2018-02-01 21:29:38 
  * @Last Modified by: Baozi
- * @Last Modified time: 2018-02-02 21:20:19
+ * @Last Modified time: 2018-02-02 15:43:27
  */
 var cheerio = require('cheerio');
 var async = require('async');
@@ -17,21 +17,18 @@ var getlist = async function (url) {
         request.get({
             url: url
         }, function (err, response, body) {
-            if(body){
-                var $ = cheerio.load(body);
-                var list = $('ul#pins');
-                list.find('li').each(function (item) {
-                    var tj = $(this);
-                    var tjhref = tj.find('a').attr('href');
-                    var tjname = tj.find('a').text();
-                    lists.push({
-                        tjhref: tjhref,
-                        tjname: tjname
-                    });
+            var $ = cheerio.load(body);
+            var list = $('ul#pins');
+            list.find('li').each(function (item) {
+                var tj = $(this);
+                var tjhref = tj.find('a').attr('href');
+                var tjname = tj.find('a').text();
+                lists.push({
+                    tjhref: tjhref,
+                    tjname: tjname
                 });
-                resolve(lists);
-            }
-
+            });
+            resolve(lists);
         });
     });
 };
@@ -40,17 +37,14 @@ var getimglist = function (url, callback) {
         request.get({
             url: url
         }, function (err, response, body) {
-            if(body){
-                var $ = cheerio.load(body);
-                var list = $('div.pagenavi');
-                list.find('a').each(function (item) {
-                    var img = $(this);
-                    var href = img.find('span').text();
-                    tjhref[item] = href;
-                });
-                resolve(tjhref[tjhref.length - 2]);
-            }
-
+            var $ = cheerio.load(body);
+            var list = $('div.pagenavi');
+            list.find('a').each(function (item) {
+                var img = $(this);
+                var href = img.find('span').text();
+                tjhref[item] = href;
+            });
+            resolve(tjhref[tjhref.length - 2]);
         });
     });
 };
@@ -59,18 +53,15 @@ var getimg = function (url, dir) {
         request.get({
             url: url
         }, function (err, response, body) {
-            if(body){
-                var href = '';
-                var pic = '';
-                var $ = cheerio.load(body);
-                var list = $('div.main-image');
-                list.find('p').each(function (item) {
-                    pic = $(this);
-                    href = pic.find('a').children('img').attr('src');
-                });
-                resolve(href);
-            }
-
+            var href = '';
+            var pic = '';
+            var $ = cheerio.load(body);
+            var list = $('div.main-image');
+            list.find('p').each(function (item) {
+                pic = $(this);
+                href = pic.find('a').children('img').attr('src');
+            });
+            resolve(href);
         });
     });
 };
@@ -109,14 +100,13 @@ var start = async function () {
         for (var i in result) {
             let result1 = await getimglist(result[i].tjhref);
             fs.mkdir(result[i].tjname, 0777, function (err) {
-                console.log(err);
             });
             console.log('创建目录：', result[i].tjname)
             console.log('该图集一共有：' + result1 + '张图片');
             for (var n = 1; n <= result1; n++) {
                 let result2 = await getimg(result[i].tjhref + '/' + n);
                 let result3 = await download(result2, result[i].tjname, n)
-                
+                console.log(result3);
             }
         }
     }
