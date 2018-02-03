@@ -2,7 +2,7 @@
  * @Author: Baozi 
  * @Date: 2018-02-01 21:29:38 
  * @Last Modified by: Baozi
- * @Last Modified time: 2018-02-02 21:15:26
+ * @Last Modified time: 2018-02-03 12:28:07
  */
 var cheerio = require('cheerio');
 var async = require('async');
@@ -30,6 +30,8 @@ var getlist = async function (url) {
                     });
                 });
                 resolve(lists);
+            }else{
+                console.log('未获取到数据');
             }
 
         });
@@ -49,6 +51,8 @@ var getimglist = function (url, callback) {
                     tjhref[item] = href;
                 });
                 resolve(tjhref[tjhref.length - 2]);
+            }else{
+                console.log('未获取到数据');
             }
 
         });
@@ -69,6 +73,8 @@ var getimg = function (url, dir) {
                     href = pic.find('a').children('img').attr('src');
                 });
                 resolve(href);
+            }else{
+                console.log('未获取到数据');
             }
 
         });
